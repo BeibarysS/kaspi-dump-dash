@@ -2,11 +2,9 @@ import {
   BarChart3, 
   Package, 
   TrendingDown, 
-  Settings, 
-  Users, 
-  AlertTriangle,
-  DollarSign,
-  Target
+  Settings,
+  FileText,
+  Lock
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
@@ -30,6 +28,7 @@ const mainItems = [
 ]
 
 const managementItems = [
+  { title: "Pricelist", url: "/pricelist", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
 ]
 

@@ -7,18 +7,17 @@ import {
   Search, 
   Filter, 
   Plus, 
-  TrendingUp, 
-  TrendingDown,
-  Eye,
   Edit,
-  MoreHorizontal
+  DollarSign
 } from "lucide-react"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import {
   Table,
   TableBody,
@@ -30,65 +29,57 @@ import {
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("")
+  const [editingProduct, setEditingProduct] = useState<any>(null)
+  const [minPrice, setMinPrice] = useState("")
+  const [maxPrice, setMaxPrice] = useState("")
 
   const products = [
     {
       id: 1,
       name: "Samsung Galaxy S24 Ultra",
-      sku: "SAM-S24U-256",
       currentPrice: "399,990 ₸",
-      competitorPrice: "389,990 ₸",
-      margin: "15.2%",
-      status: "underpriced",
-      sales: 127,
-      trend: "down"
+      minPrice: "350,000 ₸",
+      maxPrice: "450,000 ₸",
+      category: "Smartphones"
     },
     {
       id: 2,
       name: "iPhone 15 Pro Max",
-      sku: "APL-15PM-256",
       currentPrice: "599,990 ₸",
-      competitorPrice: "609,990 ₸",
-      margin: "22.8%",
-      status: "competitive",
-      sales: 89,
-      trend: "up"
+      minPrice: "550,000 ₸",
+      maxPrice: "650,000 ₸",
+      category: "Smartphones"
     },
     {
       id: 3,
       name: "MacBook Air M3",
-      sku: "APL-MBA-M3-512",
       currentPrice: "449,990 ₸",
-      competitorPrice: "439,990 ₸",
-      margin: "18.5%",
-      status: "overpriced",
-      sales: 34,
-      trend: "down"
+      minPrice: "400,000 ₸",
+      maxPrice: "500,000 ₸",
+      category: "Laptops"
     },
     {
       id: 4,
       name: "AirPods Pro 2",
-      sku: "APL-APP2-2023",
       currentPrice: "89,990 ₸",
-      competitorPrice: "92,990 ₸",
-      margin: "25.3%",
-      status: "competitive",
-      sales: 156,
-      trend: "up"
+      minPrice: "75,000 ₸",
+      maxPrice: "100,000 ₸",
+      category: "Audio"
     }
   ]
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "competitive":
-        return "bg-success text-success-foreground"
-      case "underpriced":
-        return "bg-warning text-warning-foreground"
-      case "overpriced":
-        return "bg-destructive text-destructive-foreground"
-      default:
-        return "bg-secondary text-secondary-foreground"
-    }
+  const handleSetPriceRange = (product: any) => {
+    setEditingProduct(product)
+    setMinPrice(product.minPrice.replace(" ₸", "").replace(",", ""))
+    setMaxPrice(product.maxPrice.replace(" ₸", "").replace(",", ""))
+  }
+
+  const handleSavePriceRange = () => {
+    // Here you would save the price range to your backend
+    console.log(`Setting price range for ${editingProduct.name}: ${minPrice} - ${maxPrice}`)
+    setEditingProduct(null)
+    setMinPrice("")
+    setMaxPrice("")
   }
 
   return (
@@ -138,12 +129,10 @@ const Products = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
-                <TableHead>SKU</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead>Current Price</TableHead>
-                <TableHead>Competitor Price</TableHead>
-                <TableHead>Margin</TableHead>
-                <TableHead>Sales</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Min Price</TableHead>
+                <TableHead>Max Price</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -151,47 +140,72 @@ const Products = () => {
               {products.map((product) => (
                 <TableRow key={product.id} className="hover:bg-secondary/50">
                   <TableCell>
-                    <div>
-                      <div className="font-medium text-foreground">{product.name}</div>
-                    </div>
+                    <div className="font-medium text-foreground">{product.name}</div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{product.sku}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{product.category}</Badge>
+                  </TableCell>
                   <TableCell className="font-medium">{product.currentPrice}</TableCell>
-                  <TableCell className="text-muted-foreground">{product.competitorPrice}</TableCell>
+                  <TableCell className="text-muted-foreground">{product.minPrice}</TableCell>
+                  <TableCell className="text-muted-foreground">{product.maxPrice}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{product.margin}</span>
-                      {product.trend === "up" ? (
-                        <TrendingUp className="w-3 h-3 text-success" />
-                      ) : (
-                        <TrendingDown className="w-3 h-3 text-destructive" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{product.sales}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(product.status)}>
-                      {product.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="w-4 h-4" />
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSetPriceRange(product)}
+                        >
+                          <DollarSign className="w-4 h-4 mr-2" />
+                          Set Price Range
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Product
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Set Price Range</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="font-medium text-foreground mb-2">{editingProduct?.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Current price: {editingProduct?.currentPrice}
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="minPrice">Minimum Price (₸)</Label>
+                              <Input
+                                id="minPrice"
+                                type="number"
+                                placeholder="350000"
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="maxPrice">Maximum Price (₸)</Label>
+                              <Input
+                                id="maxPrice"
+                                type="number"
+                                placeholder="450000"
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setEditingProduct(null)}>
+                              Cancel
+                            </Button>
+                            <Button onClick={handleSavePriceRange} className="bg-gradient-primary hover:opacity-90">
+                              Save Range
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               ))}
