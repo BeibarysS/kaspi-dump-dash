@@ -27,13 +27,9 @@ const mainItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Products", url: "/products", icon: Package },
   { title: "Price Monitoring", url: "/monitoring", icon: TrendingDown },
-  { title: "Competitors", url: "/competitors", icon: Target },
-  { title: "Analytics", url: "/analytics", icon: DollarSign },
 ]
 
 const managementItems = [
-  { title: "Alerts", url: "/alerts", icon: AlertTriangle },
-  { title: "Team", url: "/team", icon: Users },
   { title: "Settings", url: "/settings", icon: Settings },
 ]
 
@@ -58,10 +54,10 @@ export function AppSidebar() {
       className={collapsed ? "w-14" : "w-64"}
       collapsible="icon"
     >
-      <SidebarContent className="bg-card border-r border-border">
+      <SidebarContent className="bg-card/50 backdrop-blur-sm border-r border-border">
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-soft">
               <TrendingDown className="w-4 h-4 text-primary-foreground" />
             </div>
             {!collapsed && (

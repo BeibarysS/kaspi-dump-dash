@@ -7,8 +7,6 @@ import { Layout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import PriceMonitoring from "./pages/PriceMonitoring";
-import Analytics from "./pages/Analytics";
-import Competitors from "./pages/Competitors";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -25,8 +23,6 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/products" element={<Products />} />
             <Route path="/monitoring" element={<PriceMonitoring />} />
-            <Route path="/competitors" element={<Competitors />} />
-            <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
