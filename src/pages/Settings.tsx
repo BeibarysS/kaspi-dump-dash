@@ -25,7 +25,7 @@ const Settings = () => {
             Configure your kaspiBot preferences and integrations
           </p>
         </div>
-        <Button className="bg-gradient-primary hover:opacity-90">
+        <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-soft">
           <Save className="w-4 h-4 mr-2" />
           Save Changes
         </Button>
@@ -190,7 +190,7 @@ const Settings = () => {
                   <span>12,450 / 50,000</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: "25%" }}></div>
+                  <div className="bg-primary h-2 rounded-full w-1/4 transition-all duration-300"></div>
                 </div>
               </div>
               
@@ -200,7 +200,7 @@ const Settings = () => {
                   <span>1,247 / 2,000</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: "62%" }}></div>
+                  <div className="bg-primary h-2 rounded-full w-3/5 transition-all duration-300"></div>
                 </div>
               </div>
               
@@ -210,7 +210,7 @@ const Settings = () => {
                   <span>8,934 / 25,000</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: "36%" }}></div>
+                  <div className="bg-primary h-2 rounded-full w-1/3 transition-all duration-300"></div>
                 </div>
               </div>
             </CardContent>
