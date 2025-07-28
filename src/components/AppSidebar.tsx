@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: BarChart3 },
+  { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
   { title: "Products", url: "/products", icon: Package },
   { title: "Price Monitoring", url: "/monitoring", icon: TrendingDown },
 ]
@@ -39,7 +39,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed"
 
   const isActive = (path: string) => {
-    if (path === "/") return currentPath === "/"
+    if (path === "/dashboard") return currentPath === "/dashboard"
     return currentPath.startsWith(path)
   }
 

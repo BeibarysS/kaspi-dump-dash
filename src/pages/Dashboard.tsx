@@ -1,16 +1,53 @@
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { KaspiConnectionDialog } from "@/components/KaspiConnectionDialog"
 import { 
   TrendingUp, 
   TrendingDown, 
   Package, 
   DollarSign, 
   AlertTriangle,
-  Eye
+  Eye,
+  Link,
+  CheckCircle
 } from "lucide-react"
+import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/integrations/supabase/client'
 
 const Dashboard = () => {
+  const { user } = useAuth()
+  const [isKaspiConnected, setIsKaspiConnected] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const checkKaspiConnection = async () => {
+      if (!user) return
+      
+      try {
+        const { data, error } = await supabase
+          .from('kaspi_shops')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle()
+
+        if (!error && data) {
+          setIsKaspiConnected(true)
+        }
+      } catch (err) {
+        console.error('Error checking Kaspi connection:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkKaspiConnection()
+  }, [user])
+
+  const handleConnectionSaved = () => {
+    setIsKaspiConnected(true)
+  }
   const stats = [
     {
       title: "Total Products",
@@ -79,10 +116,27 @@ const Dashboard = () => {
             Monitor your pricing strategy and marketplace performance
           </p>
         </div>
-        <Button className="bg-gradient-primary hover:opacity-90">
-          <Eye className="w-4 h-4 mr-2" />
-          View All Products
-        </Button>
+        <div className="flex gap-3">
+          {!loading && (
+            isKaspiConnected ? (
+              <Button variant="outline" className="text-success border-success hover:bg-success/10">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Kaspi Connected
+              </Button>
+            ) : (
+              <KaspiConnectionDialog onConnectionSaved={handleConnectionSaved}>
+                <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90">
+                  <Link className="w-4 h-4 mr-2" />
+                  Connect Kaspi
+                </Button>
+              </KaspiConnectionDialog>
+            )
+          )}
+          <Button variant="outline">
+            <Eye className="w-4 h-4 mr-2" />
+            View All Products
+          </Button>
+        </div>
       </div>
 
       {/* Stats Grid */}
