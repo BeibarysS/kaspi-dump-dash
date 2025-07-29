@@ -10,7 +10,7 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
-import PriceMonitoring from "./pages/PriceMonitoring";
+
 import Pricelist from "./pages/Pricelist";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -41,13 +41,6 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <Products />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            <Route path="/monitoring" element={
-              <ProtectedRoute>
-                <Layout>
-                  <PriceMonitoring />
                 </Layout>
               </ProtectedRoute>
             } />

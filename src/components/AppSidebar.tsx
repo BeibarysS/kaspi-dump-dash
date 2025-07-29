@@ -24,7 +24,6 @@ import {
 const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
   { title: "Products", url: "/products", icon: Package },
-  { title: "Price Monitoring", url: "/monitoring", icon: TrendingDown },
 ]
 
 const managementItems = [

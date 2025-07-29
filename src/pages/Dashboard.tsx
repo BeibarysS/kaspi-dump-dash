@@ -15,9 +15,11 @@ import {
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/integrations/supabase/client'
+import { useNavigate } from "react-router-dom"
 
 const Dashboard = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [isKaspiConnected, setIsKaspiConnected] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -132,7 +134,7 @@ const Dashboard = () => {
               </KaspiConnectionDialog>
             )
           )}
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => navigate("/products")}>
             <Eye className="w-4 h-4 mr-2" />
             View All Products
           </Button>

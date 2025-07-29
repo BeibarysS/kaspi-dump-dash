@@ -3,12 +3,15 @@ import { AppSidebar } from "@/components/AppSidebar"
 import { Bell, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useNavigate } from "react-router-dom"
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
 export function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate()
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-dark">
@@ -28,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
               <Button variant="ghost" size="icon">
                 <Bell className="w-4 h-4" />
               </Button>
-              <Avatar>
+              <Avatar className="cursor-pointer" onClick={() => navigate("/settings")}>
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   <User className="w-4 h-4" />
                 </AvatarFallback>
