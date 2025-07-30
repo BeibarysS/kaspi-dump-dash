@@ -10,28 +10,93 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/integrations/supabase/client'
 
 const Settings = () => {
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [formData, setFormData] = useState({
-    company: "KaspiSeller Pro",
-    email: "seller@kaspi.kz",
-    phone: "+7 777 123 4567",
+    company: "",
+    email: "",
+    phone: "",
     timezone: "Asia/Almaty"
   })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadProfile()
+  }, [user])
+
+  const loadProfile = async () => {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        throw error
+      }
+
+      if (data) {
+        setFormData({
+          company: data.company || "",
+          email: data.email || user.email || "",
+          phone: data.phone || "",
+          timezone: data.timezone || "Asia/Almaty"
+        })
+      } else {
+        // Create initial profile if it doesn't exist
+        setFormData(prev => ({
+          ...prev,
+          email: user.email || ""
+        }))
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSaveChanges = () => {
-    toast({
-      title: "Settings saved",
-      description: "Your preferences have been updated successfully."
-    })
+  const handleSaveChanges = async () => {
+    if (!user) return
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: formData.email,
+          company: formData.company,
+          phone: formData.phone,
+          timezone: formData.timezone,
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) throw error
+
+      toast({
+        title: "Settings saved",
+        description: "Your preferences have been updated successfully."
+      })
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
   const handleSignOut = async () => {

@@ -1,4 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,58 +31,82 @@ import {
 } from "@/components/ui/table"
 
 const Products = () => {
+  const { user } = useAuth()
+  const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
   const [editingProduct, setEditingProduct] = useState<any>(null)
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const products = [
-    {
-      id: 1,
-      name: "Samsung Galaxy S24 Ultra",
-      currentPrice: "399,990 ₸",
-      minPrice: "350,000 ₸",
-      maxPrice: "450,000 ₸",
-      category: "Smartphones"
-    },
-    {
-      id: 2,
-      name: "iPhone 15 Pro Max",
-      currentPrice: "599,990 ₸",
-      minPrice: "550,000 ₸",
-      maxPrice: "650,000 ₸",
-      category: "Smartphones"
-    },
-    {
-      id: 3,
-      name: "MacBook Air M3",
-      currentPrice: "449,990 ₸",
-      minPrice: "400,000 ₸",
-      maxPrice: "500,000 ₸",
-      category: "Laptops"
-    },
-    {
-      id: 4,
-      name: "AirPods Pro 2",
-      currentPrice: "89,990 ₸",
-      minPrice: "75,000 ₸",
-      maxPrice: "100,000 ₸",
-      category: "Audio"
+  useEffect(() => {
+    fetchProducts()
+  }, [user])
+
+  const fetchProducts = async () => {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setProducts(data || [])
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load products",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   const handleSetPriceRange = (product: any) => {
     setEditingProduct(product)
-    setMinPrice(product.minPrice.replace(" ₸", "").replace(",", ""))
-    setMaxPrice(product.maxPrice.replace(" ₸", "").replace(",", ""))
+    setMinPrice(product.min_price ? product.min_price.toString() : "")
+    setMaxPrice(product.max_price ? product.max_price.toString() : "")
   }
 
-  const handleSavePriceRange = () => {
-    // Here you would save the price range to your backend
-    console.log(`Setting price range for ${editingProduct.name}: ${minPrice} - ${maxPrice}`)
-    setEditingProduct(null)
-    setMinPrice("")
-    setMaxPrice("")
+  const handleSavePriceRange = async () => {
+    if (!editingProduct || !user) return
+
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          min_price: minPrice ? parseInt(minPrice) : null,
+          max_price: maxPrice ? parseInt(maxPrice) : null
+        })
+        .eq('id', editingProduct.id)
+        .eq('user_id', user.id)
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "Price range updated successfully"
+      })
+
+      // Refresh products list
+      fetchProducts()
+      setEditingProduct(null)
+      setMinPrice("")
+      setMaxPrice("")
+    } catch (error) {
+      console.error('Error saving price range:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update price range",
+        variant: "destructive"
+      })
+    }
   }
 
   return (
@@ -137,17 +164,34 @@ const Products = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-secondary/50">
-                  <TableCell>
-                    <div className="font-medium text-foreground">{product.name}</div>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    Loading products...
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{product.category}</Badge>
+                </TableRow>
+              ) : products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    No products found
                   </TableCell>
-                  <TableCell className="font-medium">{product.currentPrice}</TableCell>
-                  <TableCell className="text-muted-foreground">{product.minPrice}</TableCell>
-                  <TableCell className="text-muted-foreground">{product.maxPrice}</TableCell>
+                </TableRow>
+              ) : (
+                products.map((product) => (
+                  <TableRow key={product.id} className="hover:bg-secondary/50">
+                    <TableCell>
+                      <div className="font-medium text-foreground">{product.name}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Product</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">{product.current_price?.toLocaleString()} ₸</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {product.min_price ? `${product.min_price.toLocaleString()} ₸` : 'Not set'}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {product.max_price ? `${product.max_price.toLocaleString()} ₸` : 'Not set'}
+                    </TableCell>
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
@@ -206,9 +250,10 @@ const Products = () => {
                         </div>
                       </DialogContent>
                     </Dialog>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
