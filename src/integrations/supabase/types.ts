@@ -49,6 +49,7 @@ export type Database = {
           created_at: string | null
           current_price: number
           id: string
+          image: string | null
           last_checked: string | null
           max_price: number | null
           min_price: number | null
@@ -59,6 +60,7 @@ export type Database = {
           created_at?: string | null
           current_price: number
           id?: string
+          image?: string | null
           last_checked?: string | null
           max_price?: number | null
           min_price?: number | null
@@ -69,6 +71,7 @@ export type Database = {
           created_at?: string | null
           current_price?: number
           id?: string
+          image?: string | null
           last_checked?: string | null
           max_price?: number | null
           min_price?: number | null
