@@ -10,11 +10,29 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
+import { useState } from 'react'
 
 const Settings = () => {
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [formData, setFormData] = useState({
+    company: "KaspiSeller Pro",
+    email: "seller@kaspi.kz",
+    phone: "+7 777 123 4567",
+    timezone: "Asia/Almaty"
+  })
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleSaveChanges = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your preferences have been updated successfully."
+    })
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -44,7 +62,10 @@ const Settings = () => {
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out
           </Button>
-          <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-soft">
+          <Button 
+            onClick={handleSaveChanges}
+            className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-soft"
+          >
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -64,22 +85,43 @@ const Settings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="company">Company Name</Label>
-                <Input id="company" placeholder="Your Company" defaultValue="KaspiSeller Pro" />
+                <Input 
+                  id="company" 
+                  placeholder="Your Company" 
+                  value={formData.company}
+                  onChange={(e) => handleInputChange('company', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" placeholder="your@email.com" defaultValue="seller@kaspi.kz" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                />
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" placeholder="+7 777 123 4567" defaultValue="+7 777 123 4567" />
+                <Input 
+                  id="phone" 
+                  placeholder="+7 777 123 4567" 
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="timezone">Timezone</Label>
-                <Input id="timezone" placeholder="Asia/Almaty" defaultValue="Asia/Almaty" />
+                <Input 
+                  id="timezone" 
+                  placeholder="Asia/Almaty" 
+                  value={formData.timezone}
+                  onChange={(e) => handleInputChange('timezone', e.target.value)}
+                />
               </div>
             </div>
           </CardContent>
