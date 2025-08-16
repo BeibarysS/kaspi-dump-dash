@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -47,35 +47,35 @@ export type Database = {
       products: {
         Row: {
           created_at: string | null
-          current_price: number
           id: string
           image: string | null
           last_checked: string | null
           max_price: number | null
           min_price: number | null
           name: string
+          price: number
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
-          current_price: number
           id?: string
           image?: string | null
           last_checked?: string | null
           max_price?: number | null
           min_price?: number | null
           name: string
+          price: number
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
-          current_price?: number
           id?: string
           image?: string | null
           last_checked?: string | null
           max_price?: number | null
           min_price?: number | null
           name?: string
+          price?: number
           user_id?: string | null
         }
         Relationships: []
@@ -110,6 +110,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          features: string[] | null
+          id: string
+          max_products: number | null
+          name: string
+          price: number
+          update_frequency: string | null
+        }
+        Insert: {
+          created_at?: string
+          features?: string[] | null
+          id?: string
+          max_products?: number | null
+          name: string
+          price: number
+          update_frequency?: string | null
+        }
+        Update: {
+          created_at?: string
+          features?: string[] | null
+          id?: string
+          max_products?: number | null
+          name?: string
+          price?: number
+          update_frequency?: string | null
+        }
+        Relationships: []
+      }
       system_logs: {
         Row: {
           details: string | null
@@ -130,6 +160,56 @@ export type Database = {
           timestamp?: string | null
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          kaspi_transaction_id: string | null
+          payment_method: string | null
+          plan_id: string | null
+          status: string
+          subscription_end: string | null
+          subscription_start: string | null
+          trial_end_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kaspi_transaction_id?: string | null
+          payment_method?: string | null
+          plan_id?: string | null
+          status?: string
+          subscription_end?: string | null
+          subscription_start?: string | null
+          trial_end_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kaspi_transaction_id?: string | null
+          payment_method?: string | null
+          plan_id?: string | null
+          status?: string
+          subscription_end?: string | null
+          subscription_start?: string | null
+          trial_end_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {
@@ -157,7 +237,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_subscription_status: {
+        Args: { user_uuid: string }
+        Returns: {
+          days_remaining: number
+          has_access: boolean
+          max_products: number
+          plan_name: string
+          status: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
