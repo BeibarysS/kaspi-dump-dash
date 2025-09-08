@@ -10,7 +10,8 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
-
+import Pricing from "./pages/Pricing";
+import Admin from "./pages/Admin";
 import Pricelist from "./pages/Pricelist";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/landing" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/pricing" element={<Pricing />} />
             
             {/* Protected routes */}
             <Route path="/dashboard" element={
@@ -56,6 +58,11 @@ const App = () => (
                 <Layout>
                   <Settings />
                 </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             } />
             

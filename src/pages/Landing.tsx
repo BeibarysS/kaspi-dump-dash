@@ -77,12 +77,20 @@ const Landing = () => {
                 <p className="text-xs text-muted-foreground">Price Management</p>
               </div>
             </div>
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90"
-            >
-              Login / Register
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => navigate('/pricing')}
+                variant="outline"
+              >
+                Тарифы
+              </Button>
+              <Button 
+                onClick={() => navigate('/auth')}
+                className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+              >
+                Войти
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -102,14 +110,15 @@ const Landing = () => {
               onClick={() => navigate('/auth')}
               className="bg-gradient-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-3"
             >
-              Start Free Trial
+              Попробовать бесплатно
             </Button>
             <Button 
               size="lg" 
               variant="outline"
+              onClick={() => navigate('/pricing')}
               className="text-lg px-8 py-3"
             >
-              Watch Demo
+              Посмотреть тарифы
             </Button>
           </div>
         </div>
@@ -203,9 +212,9 @@ const Landing = () => {
                   <Button 
                     className="w-full"
                     variant={index === 1 ? "default" : "outline"}
-                    onClick={() => navigate('/auth')}
+                    onClick={() => navigate('/pricing')}
                   >
-                    Start Free Trial
+                    Выбрать план
                   </Button>
                 </CardContent>
               </Card>
