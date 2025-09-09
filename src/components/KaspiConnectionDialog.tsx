@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,11 +26,13 @@ import { useAuth } from '@/hooks/useAuth'
 interface KaspiConnectionDialogProps {
   children: React.ReactNode
   onConnectionSaved?: () => void
+  isEdit?: boolean
+  currentLogin?: string
 }
 
-export function KaspiConnectionDialog({ children, onConnectionSaved }: KaspiConnectionDialogProps) {
+export function KaspiConnectionDialog({ children, onConnectionSaved, isEdit = false, currentLogin = '' }: KaspiConnectionDialogProps) {
   const [open, setOpen] = useState(false)
-  const [login, setLogin] = useState('')
+  const [login, setLogin] = useState(currentLogin)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -38,6 +40,11 @@ export function KaspiConnectionDialog({ children, onConnectionSaved }: KaspiConn
   
   const { toast } = useToast()
   const { user } = useAuth()
+
+  // Update login when currentLogin changes
+  useEffect(() => {
+    setLogin(currentLogin)
+  }, [currentLogin])
 
   const handleSave = async () => {
     if (!login.trim() || !password.trim()) {
@@ -91,7 +98,9 @@ export function KaspiConnectionDialog({ children, onConnectionSaved }: KaspiConn
       })
 
       setOpen(false)
-      setLogin('')
+      if (!isEdit) {
+        setLogin('')
+      }
       setPassword('')
       onConnectionSaved?.()
 
@@ -117,10 +126,10 @@ export function KaspiConnectionDialog({ children, onConnectionSaved }: KaspiConn
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            Connect to Kaspi.kz
+            {isEdit ? 'Изменить Kaspi аккаунт' : 'Подключить Kaspi аккаунт'}
           </DialogTitle>
           <DialogDescription>
-            Enter your Kaspi.kz seller account credentials to enable automated price management.
+            {isEdit ? 'Обновите данные от вашего Kaspi.kz аккаунта' : 'Введите данные от вашего Kaspi.kz аккаунта для подключения'}
           </DialogDescription>
         </DialogHeader>
 
@@ -192,10 +201,10 @@ export function KaspiConnectionDialog({ children, onConnectionSaved }: KaspiConn
               </Button>
               <Button 
                 onClick={handleSave}
-                disabled={loading}
+                disabled={loading || !login.trim() || !password.trim()}
                 className="flex-1 bg-gradient-primary text-primary-foreground hover:opacity-90"
               >
-                {loading ? 'Saving...' : 'Save Connection'}
+                {loading ? 'Сохранение...' : (isEdit ? 'Обновить' : 'Сохранить подключение')}
               </Button>
             </div>
           </CardContent>

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { KaspiConnectionDialog } from "@/components/KaspiConnectionDialog";
+
 import { DemoCountdown } from "@/components/DemoCountdown";
 import { DemoExpiredBanner } from "@/components/DemoExpiredBanner";
 import { KaspiPaymentModal } from "@/components/KaspiPaymentModal";
@@ -15,14 +15,13 @@ import { ShoppingCart, TrendingUp, Users, AlertCircle, Calendar, Crown, CheckCir
 export default function Dashboard() {
   const { user, userSubscription } = useAuth();
   const navigate = useNavigate();
-  const [isKaspiConnected, setIsKaspiConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [demoExpiration, setDemoExpiration] = useState<Date | null>(null);
 
   useEffect(() => {
     if (user) {
-      checkKaspiConnection();
+      setLoading(false);
       // Calculate demo expiration based on user creation date
       if (user.created_at) {
         const expiration = calculateDemoExpiration(new Date(user.created_at));
@@ -31,29 +30,6 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  const checkKaspiConnection = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('kaspi_shops')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!error && data) {
-        setIsKaspiConnected(true);
-      }
-    } catch (err) {
-      console.error('Error checking Kaspi connection:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConnectionSaved = () => {
-    setIsKaspiConnected(true);
-  };
 
   const handleUpgradeClick = () => {
     navigate('/pricing');
@@ -130,33 +106,7 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kaspi подключение</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              {!loading && (
-                isKaspiConnected ? (
-                  <Button variant="outline" className="text-success border-success hover:bg-success/10" disabled>
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Подключено
-                  </Button>
-                ) : (
-                  <KaspiConnectionDialog onConnectionSaved={handleConnectionSaved}>
-                    <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90" disabled={!hasAccess()}>
-                      <Link className="w-4 h-4 mr-2" />
-                      Подключить Kaspi
-                    </Button>
-                  </KaspiConnectionDialog>
-                )
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Товары</CardTitle>

@@ -11,7 +11,8 @@ import {
   Filter, 
   Plus, 
   Edit,
-  DollarSign
+  DollarSign,
+  Play
 } from "lucide-react"
 import {
   Dialog,
@@ -39,6 +40,7 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState("")
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [dampingLoading, setDampingLoading] = useState(false)
 
   useEffect(() => {
     fetchProducts()
@@ -109,6 +111,39 @@ const Products = () => {
     }
   }
 
+  const handleRunDamping = async () => {
+    setDampingLoading(true)
+    
+    try {
+      const token = localStorage.getItem('kaspi_bot_token')
+      const response = await fetch('https://kaspi-bot-backend.onrender.com/api/damping/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to start damping')
+      }
+
+      toast({
+        title: "Damping started",
+        description: "Price damping process has been initiated successfully."
+      })
+    } catch (error) {
+      console.error('Error starting damping:', error)
+      toast({
+        title: "Error",
+        description: "Failed to start damping. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setDampingLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -119,10 +154,20 @@ const Products = () => {
             Manage your product catalog and pricing strategy
           </p>
         </div>
-        <Button className="bg-gradient-primary hover:opacity-90">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={handleRunDamping}
+            disabled={dampingLoading}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Play className="w-4 h-4 mr-2" />
+            {dampingLoading ? 'Starting...' : 'Run Damping'}
+          </Button>
+          <Button className="bg-gradient-primary hover:opacity-90">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
