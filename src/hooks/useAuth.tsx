@@ -70,39 +70,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string) => {
-    try {
-      // Register with backend (this creates the Supabase user)
-      await authApi.register(email, password)
-      
-      // Then sign in with Supabase using the created credentials
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      return { error }
-    } catch (error: any) {
-      return { error }
-    }
+    const redirectUrl = `${window.location.origin}/dashboard`
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
+    })
+    return { error }
   }
 
   const signIn = async (email: string, password: string) => {
-    try {
-      // Login with backend first to get JWT
-      await authApi.login(email, password)
-      
-      // Then authenticate with Supabase
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      return { error }
-    } catch (error: any) {
-      return { error }
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+    return { error }
   }
 
   const signOut = async () => {
-    localStorage.removeItem('kaspi_bot_token')
     await supabase.auth.signOut()
   }
 
