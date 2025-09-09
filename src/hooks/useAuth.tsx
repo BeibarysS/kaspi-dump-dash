@@ -71,17 +71,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      // First register with backend
+      // Register with backend (this creates the Supabase user)
       await authApi.register(email, password)
       
-      // Then sign up with Supabase
-      const redirectUrl = `${window.location.origin}/dashboard`
-      const { error } = await supabase.auth.signUp({
+      // Then sign in with Supabase using the created credentials
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
+        password
       })
       return { error }
     } catch (error: any) {
